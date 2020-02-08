@@ -1,0 +1,419 @@
+First, we have to install the following libraries from terminal:
+
+>> sudo apt-get install csh gfortran m4 build-essential
+
+When is already installed, now we are going to see: 
+'you have to see some like this' 
+
+>> which gfortran
+/usr/bin/gfortran
+
+>> which cpp
+/usr/bin/cpp
+
+>> which gcc
+/usr/bin/gcc
+
+Then, we've to review the gcc version it would be greater than 4.x.x
+
+>> gcc --version
+
+gcc (Ubuntu 6.3.0-12ubuntu2) 6.3.0 20170406
+Copyright (C) 2016 Free Software Foundation, Inc.
+This is free software; see the source for copying conditions.  There is NO
+warranty; not even for MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+
+Create the folders, in this case I created the folder BUILD_WRF38 and the folder TESTS, you could create the name of you want.
+
+>>mkdir BUILD_WRF38 TESTS
+
+After we have to enter in TESTS
+
+>> cd TESTS
+
+Here we are going to download the test files by puting the following line
+
+>> wget http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/Fortran_C_tests.tar
+
+In order to decompress the downloaded file you have to write this:
+
+>> tar -xf Fortran_C_tests.tar
+
+Starting with tests
+- Test 1, it fix the fortran format 
+
+>> gfortran TEST_1_fortran_only_fixed.f
+>> ./a.out
+When you have executed those lines this message would be appear:
+
+SUCCESS test 1 fortran only fixed format
+
+- Test 2 format free of fortran
+
+>> gfortran TEST_2_fortran_only_free.f90
+>> ./a.out
+
+When you have executed those lines this message would be appear:
+
+Assume Fortran 2003: has FLUSH, ALLOCATABLE derived type, and ISO C Binding
+SUCCESS test 2 fortran only free format
+
+- Test 3 fix the C languaje
+
+>> gcc TEST_3_c_only.c
+>> ./a.out
+
+When you have executed those lines this message would be appear:
+
+SUCCESS test 3 C only
+- Test 4 
+Now Fortran call the function C (the gcc and gfortran have different defects, so it is necessary force it to use 64 bit [-m64] when are combined)
+
+>> gcc -c -m64 TEST_4_fortran+c_c.c
+>> gfortran -c -m64 TEST_4_fortran+c_f.f90
+>> gfortran -m64 TEST_4_fortran+c_f.o TEST_4_fortran+c_c.o
+>> ./a.out
+
+When you have executed those lines this message would be appear:
+
+C function called by Fortran
+Values are xx =  2.00 and ii = 1
+SUCCESS test 4 fortran calling c
+
+- Test 5 the csh compiler 
+>> csh TEST_csh.csh
+
+When you have executed those line this message would be appear:
+
+SUCCESS csh test
+
+- Test 6 the perl compiler
+
+>> ./TEST_perl.pl
+
+When you have executed those line this message would be appear:
+
+SUCCESS perl test
+
+- Test 7 the sh compiler
+>>./TEST_sh.sh
+
+When you have executed those line this message would be appear:
+
+SUCCESS sh test
+
+HERE WE'VE FINISHED WITH TESTS
+
+###################################################
+#             BUILDING LIBRARIES                  #
+###################################################
+Now we go into BUILD_WFR38 folder
+
+>> cd BUILD_WRF38
+
+INSIDE, we've to create another folder called 'LIBRARIES'
+
+>> mkdir LIBRARIES
+
+THEN, go into LIBRARIES
+
+>> cd LIBRARIES
+
+In this folder we are going to download all libraries that WRF-Chem need.
+
+- First the mpich library
+
+>> wget http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/mpich-3.0.4.tar.gz
+
+- Second the netcdf library
+
+>> wget http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/netcdf-4.1.3.tar.gz
+
+- Third the jasper library
+
+>> wget http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/jasper-1.900.1.tar.gz
+
+- Fourth the libpng library
+
+>> wget http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/libpng-1.2.50.tar.gz
+
+- Fifth the zlib library
+
+>> wget http://www2.mmm.ucar.edu/wrf/OnLineTutorial/compile_tutorial/tar_files/zlib-1.2.7.tar.gz
+
+Now it's time to config those downloaded libraries, but first we've to config our .bashrc, in this file we are going to add some lines,
+the lines tell the model where the libraries is located. For this purpose we go to write the following line in our terminal.
+
+>> sudo vi ~/.bashrc
+
+Here we have to touch the letter 'i' in order to edit the .bashrc file, then copy and past at the end of the file the following lines:
+
+#WRF variables de entorno
+
+export DIR=/home/hector/BUILD_WRF38/LIBRARIES
+export CC=gcc
+export CXX=g++
+export FC=gfortran
+export CFLAGS=-m64
+export F77=gfortran
+export FFLAGS=-m64
+-------------------------
+To save our changes made before we have to press ESC key and write ':wq' and press ENTER.
+Again on the terminal, for activate those lines write in .bshrc file we have to write the following line:
+
+>> source ~/.bashrc
+
+Unpacking the netcdf library and go inside:
+
+>> cd netcdf
+Here we have to write :
+
+>> ./configure --prefix=$DIR/netcdf --disable-dap --disable-netcdf-4 --disable-shared
+
+If it appear permission denied you have to write this line:
+
+>> chmod 755 ./configure
+
+And then:
+
+>> make
+>> make install
+
+Now, again we are going to modify the .bashrc file
+
+>> sudo vi ~/.bashrc
+
+Inside the file write and save these lines:
+
+export PATH=$DIR/netcdf/bin:$PATH
+export NETCDF=$DIR/netcdf
+
+And of course, activate those changes made before with this command:
+
+>> source ~/.bashrc
+
+Go out of netcdf folder and decompress mpich file, then a folder with mpich name is create automatically
+then go inside it and make the following:
+
+>> ./configure --prefix=$DIR/mpich
+
+Then write 
+
+>>make
+>>make install
+
+Again modify the .bashrc 
+luego editar las variables de entorno
+
+>>sudo vi ~/.bashrc
+
+Put this line at end of the .bashrc 
+
+export PATH=$DIR/mpich/bin:$PATH
+
+And activate 
+
+>> source ~/.bashrc
+
+Config Zlib library for grib2
+
+>> cd ..
+
+But first, modify the .bashrc file
+
+>> sudo vi ~/.bashrc
+
+Add this lines:
+
+export LDFLAGS=-L$DIR/grib2/lib
+export CPPFLAGS=-I$DIR/grib2/include
+
+And activate
+
+>> source ~/.bashrc
+
+Decompress zlib and go inside it 
+>> cd zlib
+>> ./configure --prefix=$DIR/grib2
+>> make
+>> make install
+
+Now we go out the zlib folder
+
+>> cd ..
+
+Decompress the libpng library and go inside it:
+
+>> tar -zxvf libpng-1.2.50.tar.gz
+>> cd libpng
+>> ./configure --prefix=$DIR/grib2
+>> make
+>> make install
+
+Finally with the Jasper library, we've to decompress it and go inside:
+
+>> cd jasper
+>> ./configure --prefix=$DIR/grib2
+>> make
+>> make install
+*********END OF LIBRARIES INSTALLATION***********
+
+ *** START OF TEST ***
+
+We have to go inside BUILD_WRF38 and go inside TESTS folder
+
+>> cd TESTS
+>> tar -xvf Fortran_C_NETCDF_MPI_tests.tar
+>> cp ${NETCDF}/include/netcdf.inc .
+
+Be careful: Don't forge the 'dot' at the end of the line before.
+
+>> gfortran -c 01_fortran+c+netcdf_f.f
+>> gcc -c 01_fortran+c+netcdf_c.c
+>> gfortran 01_fortran+c+netcdf_f.o 01_fortran+c+netcdf_c.o -L${NETCDF}/lib -lnetcdff -lnetcdf
+>> ./a.out
+
+****All those commands would be shown ****
+
+   C function called by Fortran
+   Values are xx =  2.00 and ii = 1
+ SUCCESS test 1 fortran + c + netcdf
+
+Now, write the following lines:
+
+>>cp ${NETCDF}/include/netcdf.inc .
+
+Be careful: Don't forge the 'dot' at the end of the line before.
+
+>> mpif90 -c 02_fortran+c+netcdf+mpi_f.f
+>> mpicc -c 02_fortran+c+netcdf+mpi_c.c
+>> mpif90 02_fortran+c+netcdf+mpi_f.o 02_fortran+c+netcdf+mpi_c.o -L${NETCDF}/lib -lnetcdff -lnetcdf
+>> mpirun ./a.out
+
+****All those commands would be shown ****
+
+   C function called by Fortran
+   Values are xx =  2.00 and ii = 1
+ status =            2
+ SUCCESS test 2 fortran + c + netcdf + mpi
+ 
+*****************END OF TEST*********************
+##################################
+# Start of installation of WRF3.8#
+##################################
+We have to download the following files:
+
+WRFV3.8.TAR.gz
+WPS3.8.TAR.gz
+WRFV3-Chem-3.8.TAR.gz
+
+In this page 'https://www2.mmm.ucar.edu/wrf/users/downloads.html' you can find those files.
+
+Those files would be decompressed inside the BUILD_WRF38, and put the folder "chem" inside thre folder "WRFV3", then inside
+the folder WRFV3:
+
+>> cd WRFV3
+************************************************************
+Put the Variables for activate the core ARW and chem module
+************************************************************
+>> export WRF_EM_CORE=1
+>> export WRF_NMM_CORE=0               
+>> export WRF_CHEM=1
+>> export WRF_KPP=0
+********************************************************
+Then you have to put this line:
+
+>>./configure
+
+Here you would be choose the "34" option and press ENTER (as many times as it allow), finally a message like this would be appear:
+
+Testing for NetCDF, C and Fortran compiler
+
+This installation of NetCDF is 64-bit
+                 C compiler is 64-bit
+           Fortran compiler is 64-bit
+              It will build in 64-bit
+
+########################################################
+
+Now we can install the WRF-CHEM the real case
+
+>> ./compile em_real >& compile.log &
+
+If you want wee how your installation is advancing, you can write this line:
+
+>> tail -f compile.log
+
+***********wait more or less 34 minutes would be appear the following**********
+                                 
+==========================================================================
+build started:   mar may 23 22:56:23 -05 2017
+build completed: mar may 23 23:34:09 -05 2017
+
+--->                  Executables successfully built                  <---
+
+-rwxrwxr-x 1 hector hector 55016400 may 23 23:34 main/ndown.exe
+-rwxrwxr-x 1 hector hector 54897720 may 23 23:34 main/real.exe
+-rwxrwxr-x 1 hector hector 54289656 may 23 23:34 main/tc.exe
+-rwxrwxr-x 1 hector hector 61826768 may 23 23:29 main/wrf.exe
+
+==========================================================================
+
+We can already install the WPS it is a pre-processing tool for WRF and WRF-CHem, but first
+we have to download the WPS3.8 and put it inside the BUILD_WRF38 decompress there.
+
+>> cd WPS
+>> ./clean
+
+Now we can add environment variables for WRF in .bashrc file:
+
+>> sudo vi ~/.bashrc
+
+export JASPERLIB=$DIR/grib2/lib
+export JASPERINC=$DIR/grib2/include
+
+Then, we activate 
+>> source ~/.bashrc
+******************************
+We compile WPS:
+
+>> ./configure
+**We choose the option 1**
+
+The file configure.wps has been created and we edite it (>> vi configure.wps). We look up the line  "WRF_DIR=../WRFV3" and change the path when
+we have the WRFV3 folder, in my case WRF_DIR =  /home/hector/BUILD_WRF38/WRFV3. After that we make the compilation:
+
+>> ./compile >& compile.log &
+>> tail -f compile.log
+
+******would be appear some like this********
+if [ -h int2nc.exe ] ; then \
+        /bin/rm -f int2nc.exe ; \
+fi ; \
+if [ -h ../int2nc.exe ] ; then \
+        /bin/rm -f ../int2nc.exe ; \
+fi ; \
+if [ -e src/int2nc.exe ] ; then \
+        ln -sf src/int2nc.exe . ; \
+fi
+
+*****THE END - CONGRATS YOU HAVE THE WRF-CHEM MODEL INSTALLED IN YOUR OUWN PC******
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
