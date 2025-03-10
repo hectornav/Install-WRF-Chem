@@ -34,6 +34,7 @@ The folder `WRF_CHEM_FILES` contains essential files for the installation. You *
 
 1. Download the folder from this link:  
    [WRF_CHEM_FILES on Google Drive](https://drive.google.com/drive/folders/1-6BQ7A-RTu7s7VggeJ5qeldBOQew31DY?usp=drive_link)
+   **NOTE**: If you do not have access to the folder, please send me an email at h.navarrobarboza@gmail.com to request access.
 2. Place the downloaded folder inside the root of this repository.
 ---
 
