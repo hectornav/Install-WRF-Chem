@@ -37,6 +37,11 @@ EOL
 # Function to install NetCDF
 install_netcdf() {
     echo "Installing NetCDF..."
+    # Check if NetCDF directory exists
+    if [ ! -d "$LIBRARIES_DIR/netcdf-4.1.3" ]; then
+        tar -xzf "$LIBRARIES_DIR/netcdf-4.1.3.tar.gz" -C "$LIBRARIES_DIR"
+    fi   
+    # Change to the NetCDF directory
     cd "$LIBRARIES_DIR/netcdf-4.1.3"
 
     # Configure NetCDF
@@ -47,13 +52,13 @@ install_netcdf() {
     fi
 
     # Compile and install NetCDF
-    make
+    sudo make
     if [ $? -ne 0 ]; then
         echo "Error: NetCDF compilation failed."
         exit 1
     fi
 
-    make install
+    sudo make install
     if [ $? -ne 0 ]; then
         echo "Error: NetCDF installation failed."
         exit 1
@@ -74,7 +79,11 @@ EOL
 # Function to install MPICH
 install_mpich() {
     echo "Installing MPICH..."
-    cd "$LIBRARIES_DIR/mpich-3.0.4"
+    # Check if MPICH directory exists
+    if [ ! -d "$LIBRARIES_DIR/mpich-3.4.0" ]; then
+        tar -xzf "$LIBRARIES_DIR/mpich-3.4.0.tar.gz" -C "$LIBRARIES_DIR"
+    fi
+    cd "$LIBRARIES_DIR/mpich-3.4.0"
     #cleaning 
     sudo make clean
 
@@ -87,14 +96,16 @@ install_mpich() {
     fi
 
     # Configure MPICH
-    ./configure --prefix="$DIR/mpich"
+    #sudo ./configure --prefix="$DIR/mpich"
+    sudo ./configure FFLAGS="-fallow-argument-mismatch"
+
     if [ $? -ne 0 ]; then
         echo "Error: MPICH configuration failed."
         exit 1
     fi
 
     # Compile MPICH
-    make
+    sudo make
     if [ $? -ne 0 ]; then
         echo "Error: MPICH compilation failed."
         exit 1
@@ -121,6 +132,10 @@ EOL
 # Function to install Zlib
 install_zlib() {
     echo "Installing Zlib..."
+    # Check if Zlib directory exists
+    if [ ! -d "$LIBRARIES_DIR/zlib-1.2.7" ]; then
+        tar -xzf "$LIBRARIES_DIR/zlib-1.2.7.tar.gz" -C "$LIBRARIES_DIR"
+    fi
     cd "$LIBRARIES_DIR/zlib-1.2.7"
 
     # Configure Zlib
@@ -158,6 +173,10 @@ EOL
 # Function to install libpng
 install_libpng() {
     echo "Installing libpng..."
+    # Check if libpng directory exists
+    if [ ! -d "$LIBRARIES_DIR/libpng-1.2.50" ]; then
+        tar -xzf "$LIBRARIES_DIR/libpng-1.2.50.tar.gz" -C "$LIBRARIES_DIR"
+    fi
     cd "$LIBRARIES_DIR/libpng-1.2.50"
 
     # Configure libpng
@@ -186,6 +205,10 @@ install_libpng() {
 # Function to install Jasper
 install_jasper() {
     echo "Installing Jasper..."
+    # Check if Jasper directory exists, jasper-1.900.1 is in zip format not tar.gz
+    if [ ! -d "$LIBRARIES_DIR/jasper-1.900.1" ]; then
+        unzip "$LIBRARIES_DIR/jasper-1.900.1.zip" -d "$LIBRARIES_DIR"
+    fi
     cd "$LIBRARIES_DIR/jasper-1.900.1"
 
     # Configure Jasper
