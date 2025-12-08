@@ -85,3 +85,5 @@ If you need the DM-parallel build for MPI, override `WPS_FORCE_DMPAR=true`. If y
 When working on this project, create feature branches (e.g., `feature/structured-wps`) from `auto-wrf`, make your changes, and push once the build passes. The current branch contains the updates to `compile_wps.sh` and this README.
 
 For any questions, contact the repository owner (Hector Navarro Barboza).
+
+<!-- Autosubmit content removed per user request -->
