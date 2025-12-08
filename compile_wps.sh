@@ -14,8 +14,39 @@ require_dir() {
 }
 
 if [ ! -d "$WPS_DIR" ]; then
-    echo "WPS directory not found at $WPS_DIR. Please install WPS under $MODEL_ROOT/WPS."
-    exit 1
+    # If WPS is not installed, try to find an archive shipped with this repo
+    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+    CANDIDATE_ARCHIVES=("$SCRIPT_DIR/WRF_CHEM_FILES/WPS.tar" \
+                        "$SCRIPT_DIR/WRF_CHEM_FILES/WPS.tar.gz" \
+                        "$SCRIPT_DIR/WRF_CHEM_FILES/WPS.tgz")
+    FOUND_ARCHIVE=""
+    for a in "${CANDIDATE_ARCHIVES[@]}"; do
+        if [ -f "$a" ]; then
+            FOUND_ARCHIVE="$a"
+            break
+        fi
+    done
+
+    if [ -n "$FOUND_ARCHIVE" ]; then
+        echo "WPS not found at $WPS_DIR, but archive discovered at: $FOUND_ARCHIVE"
+        echo "Extracting WPS archive into $MODEL_ROOT ..."
+        mkdir -p "$MODEL_ROOT"
+        # Extract into MODEL_ROOT so that an archive with top-level 'WPS' ends up at $MODEL_ROOT/WPS
+        tar -xf "$FOUND_ARCHIVE" -C "$MODEL_ROOT" || {
+            echo "Failed to extract $FOUND_ARCHIVE into $MODEL_ROOT"; exit 1; }
+        if [ -d "$WPS_DIR" ]; then
+            echo "Extraction complete: $WPS_DIR present."
+        else
+            # Some archives might contain files without a top-level WPS dir. If so, move contents into $WPS_DIR
+            mkdir -p "$WPS_DIR"
+            mv "$MODEL_ROOT"/* "$WPS_DIR" 2>/dev/null || true
+            echo "Moved extracted content into $WPS_DIR"
+        fi
+    else
+        echo "WPS directory not found at $WPS_DIR."
+        echo "Place a WPS archive named 'WPS.tar' (or .tar.gz/.tgz) into '$SCRIPT_DIR/WRF_CHEM_FILES' or install WPS under $MODEL_ROOT/WPS."
+        exit 1
+    fi
 fi
 
 LIBRARY_ROOT="${LIBRARY_ROOT:-$MODEL_ROOT/LIBRARIES}"
@@ -104,6 +135,22 @@ if [ -f configure.wps ]; then
     fi
     sed -i "s|^COMPRESSION_LIBS.*|COMPRESSION_LIBS    = -L$GRIB2_ROOT/lib -ljasper -lpng -lz|" configure.wps
     sed -i "s|^COMPRESSION_INC.*|COMPRESSION_INC     = -I$GRIB2_ROOT/include|" configure.wps
+    # Ensure OpenMP flags are present for linking (fixes undefined GOMP_* errors)
+    if ! grep -q '\-fopenmp' configure.wps; then
+        echo "Adding -fopenmp to compile/link flags in configure.wps"
+        # Add to FFLAGS if present, otherwise append a new FFLAGS line
+        if grep -q '^FFLAGS' configure.wps; then
+            sed -i -E "s|^FFLAGS([[:space:]]*=.*)|FFLAGS\1 -fopenmp|" configure.wps || true
+        else
+            echo "FFLAGS = -fopenmp" >> configure.wps
+        fi
+        # Add to LDFLAGS if present, otherwise append a new LDFLAGS line
+        if grep -q '^LDFLAGS' configure.wps; then
+            sed -i -E "s|^LDFLAGS([[:space:]]*=.*)|LDFLAGS\1 -fopenmp|" configure.wps || true
+        else
+            echo "LDFLAGS = -fopenmp" >> configure.wps
+        fi
+    fi
 fi
 
 # Set WRF directory (mirrors MODEL_ROOT convention)
