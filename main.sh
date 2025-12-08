@@ -6,18 +6,43 @@
 # Get the directory where this script is located
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
-# Define the installation directory (one level up from the script directory)
-INSTALL_DIR="$SCRIPT_DIR/../BUILD_WRF"
+# Source common helpers (colors)
+if [ -f "$SCRIPT_DIR/common.sh" ]; then
+    # shellcheck source=/dev/null
+    source "$SCRIPT_DIR/common.sh"
+fi
+
+# Prefer INSTALL_BASE from env file if present; otherwise default under user's home
+ENV_FILE_DEFAULT="$HOME/models/wrf/wrf_env.sh"
+if [ -f "${ENV_FILE:-$ENV_FILE_DEFAULT}" ]; then
+    # shellcheck source=/dev/null
+    source "${ENV_FILE:-$ENV_FILE_DEFAULT}"
+fi
+
+# Define the installation directory (fallback)
+INSTALL_DIR="${INSTALL_DIR:-$INSTALL_BASE}"
+if [ -z "$INSTALL_DIR" ]; then
+    INSTALL_DIR="$SCRIPT_DIR/../BUILD_WRF"
+fi
 
 # Function to run a script and check for errors
 run_script() {
     local script_name="$1"
-    echo "Running $script_name..."
+    if [ "${DRY_RUN:-0}" = "1" ]; then
+        info "DRY RUN: would run $script_name"
+        echo "-- Actions found in $script_name --"
+        # show likely dangerous or important commands from the script (no execution)
+        grep -nE "\b(tar|configure|make|sudo|cp|mv|rm|mkdir|./compile|./configure|source)\b" "$SCRIPT_DIR/$script_name" || true
+        echo "----------------------------------------"
+        return 0
+    fi
+
+    info "Running $script_name..."
     if ! "$SCRIPT_DIR/$script_name"; then
-        echo "Error: $script_name failed!"
+        error "Error: $script_name failed!"
         exit 1
     fi
-    echo "$script_name completed successfully."
+    success "$script_name completed successfully."
     echo "----------------------------------------"
 }
 

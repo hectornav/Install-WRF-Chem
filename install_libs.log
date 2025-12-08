@@ -1,0 +1,149 @@
++++ dirname ./install_wrf_libraries.sh
+++ cd .
+++ pwd
++ SCRIPT_DIR=/home/hector/Desktop/Projects/Install-WRF-Chem
++ '[' -f /home/hector/Desktop/Projects/Install-WRF-Chem/common.sh ']'
++ source /home/hector/Desktop/Projects/Install-WRF-Chem/common.sh
+++ RED='\033[0;31m'
+++ GREEN='\033[0;32m'
+++ YELLOW='\033[0;33m'
+++ NC='\033[0m'
++ '[' -z '' ']'
++ INSTALL_BASE=/home/hector/models/wrf
++ LIBRARIES_DIR=/home/hector/models/wrf/LIBRARIES
++ REPO_LIBRARIES_DIR=/home/hector/Desktop/Projects/Install-WRF-Chem/LIBRARIES
++ ENV_FILE=/home/hector/models/wrf/wrf_env.sh
++ '[' '!' -d /home/hector/models/wrf/LIBRARIES ']'
++ configure_environment
++ echo 'Configuring environment variables...'
+Configuring environment variables...
++ clean_old_wrfenv
++ for rc in "$HOME/.bashrc" "$HOME/.zshrc"
++ '[' -f /home/hector/.bashrc ']'
++ grep -q '>>> WRF_ENV START >>>' /home/hector/.bashrc
++ sed -i '/>>> WRF_ENV START >>>/,/<<< WRF_ENV END <<</d' /home/hector/.bashrc
++ for rc in "$HOME/.bashrc" "$HOME/.zshrc"
++ '[' -f /home/hector/.zshrc ']'
++ grep -q '>>> WRF_ENV START >>>' /home/hector/.zshrc
++ sed -i '/>>> WRF_ENV START >>>/,/<<< WRF_ENV END <<</d' /home/hector/.zshrc
++ mkdir -p /home/hector/models/wrf
++ cat
++ set_env_var DIR '"/home/hector/models/wrf/LIBRARIES"'
++ local key=DIR
++ local 'value="/home/hector/models/wrf/LIBRARIES"'
++ touch /home/hector/models/wrf/wrf_env.sh
++ grep -q '^export DIR=' /home/hector/models/wrf/wrf_env.sh
++ echo 'export DIR="/home/hector/models/wrf/LIBRARIES"'
++ set_env_var CC gcc
++ local key=CC
++ local value=gcc
++ touch /home/hector/models/wrf/wrf_env.sh
++ grep -q '^export CC=' /home/hector/models/wrf/wrf_env.sh
++ echo 'export CC=gcc'
++ set_env_var CXX g++
++ local key=CXX
++ local value=g++
++ touch /home/hector/models/wrf/wrf_env.sh
++ grep -q '^export CXX=' /home/hector/models/wrf/wrf_env.sh
++ echo 'export CXX=g++'
++ set_env_var FC gfortran
++ local key=FC
++ local value=gfortran
++ touch /home/hector/models/wrf/wrf_env.sh
++ grep -q '^export FC=' /home/hector/models/wrf/wrf_env.sh
++ echo 'export FC=gfortran'
++ set_env_var CFLAGS -m64
++ local key=CFLAGS
++ local value=-m64
++ touch /home/hector/models/wrf/wrf_env.sh
++ grep -q '^export CFLAGS=' /home/hector/models/wrf/wrf_env.sh
++ echo 'export CFLAGS=-m64'
++ set_env_var F77 gfortran
++ local key=F77
++ local value=gfortran
++ touch /home/hector/models/wrf/wrf_env.sh
++ grep -q '^export F77=' /home/hector/models/wrf/wrf_env.sh
++ echo 'export F77=gfortran'
++ set_env_var FFLAGS -m64
++ local key=FFLAGS
++ local value=-m64
++ touch /home/hector/models/wrf/wrf_env.sh
++ grep -q '^export FFLAGS=' /home/hector/models/wrf/wrf_env.sh
++ echo 'export FFLAGS=-m64'
++ '[' -f /home/hector/models/wrf/wrf_env.sh ']'
++ source /home/hector/models/wrf/wrf_env.sh
+++ export DIR=/home/hector/models/wrf/LIBRARIES
+++ DIR=/home/hector/models/wrf/LIBRARIES
+++ export CC=gcc
+++ CC=gcc
+++ export CXX=g++
+++ CXX=g++
+++ export FC=gfortran
+++ FC=gfortran
+++ export CFLAGS=-m64
+++ CFLAGS=-m64
+++ export F77=gfortran
+++ F77=gfortran
+++ export FFLAGS=-m64
+++ FFLAGS=-m64
++ install_netcdf
++ info 'Installing NetCDF...'
++ echo -e '\033[0;33mInstalling NetCDF...\033[0m'
+[0;33mInstalling NetCDF...[0m
++ '[' -d /home/hector/models/wrf/netcdf ']'
++ '[' -x /home/hector/models/wrf/netcdf/bin/nc-config ']'
++ success 'NetCDF already installed in /home/hector/models/wrf/netcdf. Skipping.'
++ echo -e '\033[0;32mNetCDF already installed in /home/hector/models/wrf/netcdf. Skipping.\033[0m'
+[0;32mNetCDF already installed in /home/hector/models/wrf/netcdf. Skipping.[0m
++ return 0
++ install_mpich
++ info 'Installing MPICH...'
++ echo -e '\033[0;33mInstalling MPICH...\033[0m'
+[0;33mInstalling MPICH...[0m
++ '[' -d /home/hector/models/wrf/mpich ']'
++ '[' -x /home/hector/models/wrf/mpich/bin/mpirun ']'
++ success 'MPICH already installed in /home/hector/models/wrf/mpich. Skipping.'
++ echo -e '\033[0;32mMPICH already installed in /home/hector/models/wrf/mpich. Skipping.\033[0m'
+[0;32mMPICH already installed in /home/hector/models/wrf/mpich. Skipping.[0m
++ return 0
++ install_zlib
++ info 'Installing Zlib...'
++ echo -e '\033[0;33mInstalling Zlib...\033[0m'
+[0;33mInstalling Zlib...[0m
++ '[' -d /home/hector/models/wrf/grib2 ']'
++ '[' -f /home/hector/models/wrf/grib2/lib/libz.a ']'
++ success 'Zlib (grib2) already installed in /home/hector/models/wrf/grib2. Skipping.'
++ echo -e '\033[0;32mZlib (grib2) already installed in /home/hector/models/wrf/grib2. Skipping.\033[0m'
+[0;32mZlib (grib2) already installed in /home/hector/models/wrf/grib2. Skipping.[0m
++ return 0
++ install_libpng
++ info 'Installing libpng...'
++ echo -e '\033[0;33mInstalling libpng...\033[0m'
+[0;33mInstalling libpng...[0m
++ '[' -d /home/hector/models/wrf/grib2 ']'
++ '[' -f /home/hector/models/wrf/grib2/lib/libpng.a ']'
++ success 'libpng already installed in /home/hector/models/wrf/grib2. Skipping.'
++ echo -e '\033[0;32mlibpng already installed in /home/hector/models/wrf/grib2. Skipping.\033[0m'
+[0;32mlibpng already installed in /home/hector/models/wrf/grib2. Skipping.[0m
++ return 0
++ install_jasper
++ info 'Installing Jasper...'
++ echo -e '\033[0;33mInstalling Jasper...\033[0m'
+[0;33mInstalling Jasper...[0m
++ '[' -d /home/hector/models/wrf/grib2 ']'
++ '[' -f /home/hector/models/wrf/grib2/lib/libjasper.a ']'
++ success 'Jasper already installed in /home/hector/models/wrf/grib2. Skipping.'
++ echo -e '\033[0;32mJasper already installed in /home/hector/models/wrf/grib2. Skipping.\033[0m'
+[0;32mJasper already installed in /home/hector/models/wrf/grib2. Skipping.[0m
++ return 0
++ add_source_to_rc
++ for rc in "$HOME/.bashrc" "$HOME/.zshrc"
++ '[' -f /home/hector/.bashrc ']'
++ grep -q '>>> WRF_ENV START >>>' /home/hector/.bashrc
++ cat
++ for rc in "$HOME/.bashrc" "$HOME/.zshrc"
++ '[' -f /home/hector/.zshrc ']'
++ grep -q '>>> WRF_ENV START >>>' /home/hector/.zshrc
++ cat
++ echo 'All libraries installed and configured successfully!'
+All libraries installed and configured successfully!
